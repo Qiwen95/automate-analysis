@@ -41,9 +41,8 @@ if ('IP Address' in df_ISTE_SWEN.columns):
 # check eligible students (completed 80% of the survey) and choose winner
 eligible = df_ISTE_SWEN.copy()
 raffle_threshold = len(df_ISTE_SWEN.columns)*.2
-eligible['Total Incomplete Answers']= pd.isnull(eligible).astype(int).sum(axis=1)
-eligible = eligible.loc[eligible['Total Incomplete Answers']<=raffle_threshold]
 
+# document and display warning if any entries are duplicates
 try:
     dup_emails = pd.concat(g for _, g in eligible.groupby(eligible.iloc[:, 5])if len(g) > 1)
     dup_emails.to_csv('Duplicate-Entries.csv', sep=",")
@@ -55,9 +54,13 @@ try:
 except:
     print("No duplicate entries\n")
 
+# add a column calculating the incomplete answers for future reference
+eligible['Total Incomplete Answers']= pd.isnull(eligible).astype(int).sum(axis=1)
+eligible = eligible.loc[eligible['Total Incomplete Answers']<=raffle_threshold]
+
+# select the raffle winner
 random_winner = randint(0,len(eligible))
 print('Raffle Winner: ', eligible.iloc[random_winner,4], eligible.iloc[random_winner,5])
-print('* Warning: If there are duplicate entries, these must be manually removed before selecting the raffle winner.\n')
 eligible.to_csv('Eligible-Participants.csv', sep=",")
 
 # omit IDP questions 8,10,19. Starts with 0 index as 'Respondent ID'
