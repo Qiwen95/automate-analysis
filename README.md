@@ -19,4 +19,9 @@ Series of scripts and programs to automate NSF-Ethics analysis and improve resul
 - Formatted-Data.csv: formatted survey data
 
 ### Notes:
-- Duplicate entries should not be automatically removed, rather manually reviewed after each phase. The best method of removal is to run the surveySetup.py script once. Then, review the Duplicate-Entries.csv and select the best entry for each participant with duplicate entries (identified by repeated name AND email). Generally, the row with the least missing values (see last column) can be selected. If the missing values are the same, its possible to select the row with the most recent end date. However, each response should be reviewed on a case-by-case basis. All duplicate entries, removals, and removal methods can be updated in the dropbox file. Once the rows have been selected, remove any rows from the Survey-for-ISTE-and-SWEN.csv file. Finally, rerun the 'surveySetup.py' script to select the raffle winner and obtain the formatted csv file.
+Duplicate entries should not be automatically removed, rather manually reviewed after each phase:
+
+1. The best method of removal is to run the surveySetup.py script once. 
+2. Review the Duplicate-Entries.csv and select the best entry for each participant with duplicate entries (identified by repeated name AND email). Generally, the row with the least missing values (see last column) can be selected. If the missing values are the same, its possible to select the row with the most recent end date. However, each response should be reviewed on a case-by-case basis. 
+3. Once the rows have been selected, remove any rows from the Survey-for-ISTE-and-SWEN.csv file. Document all duplicate entries, removals, and removal methods in the dropbox folder. 
+4. Rerun the 'surveySetup.py' script to select the raffle winner and obtain the final formatted csv file.

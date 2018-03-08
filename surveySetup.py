@@ -2,7 +2,7 @@
 
 # title: surveySetup.py
 # author: Paula Garcia
-# version: 1
+# version: 2
 # status: development
 # python_version: 3.5.2
 # description: This python script can be used after each IST and SWEN data collection period. It will automatically select a survey winner among eligible students (Eligible-Participants.csv), output repeated entries, and format the results to numeric values with no extraneous columns created by SurveyMonkey.
@@ -13,7 +13,7 @@ import re
 from random import randint
 
 def formatScale (column_list, data, scale):
-	data.iloc[:,column_list] = data.iloc[:,column_list].applymap(lambda s: scale.get(s) if s in scale else s)
+    data.iloc[:,column_list] = data.iloc[:,column_list].applymap(lambda s: scale.get(s) if s in scale else s)
 
 # import and format column headers
 df=pd.read_csv('Survey-for-ISTE-and-SWEN.csv')
@@ -30,29 +30,34 @@ df.iloc[:,10] = df.iloc[:,10].str.replace('@rit.edu','')
 df.iloc[:,10] = df.iloc[:,10].str.replace('@g.rit.edu','')
 
 # subset current collection list
-df_ISTE = df.loc[df['Collector ID'] == 98266231].dropna(axis=1, how='all')
-df_SWEN= df.loc[df['Collector ID'] == 98266252].dropna(axis=1, how='all')
+df_ISTE = df.loc[df['Collector ID'] == 98658412].dropna(axis=1, how='all')
+df_SWEN= df.loc[df['Collector ID'] == 98658411].dropna(axis=1, how='all')
 
 # combine both survey sets and remove empty columns created by Survey Monkey
 df_ISTE_SWEN = df_ISTE.append(df_SWEN)
-raffle_threshold = len(df_ISTE_SWEN.columns)*.4
+if ('IP Address' in df_ISTE_SWEN.columns):
+    df_ISTE_SWEN = df_ISTE_SWEN.drop('IP Address', 1)
 
 # check eligible students (completed 80% of the survey) and choose winner
 eligible = df_ISTE_SWEN.copy()
-dup_emails = pd.concat(g for _, g in eligible.groupby(eligible.iloc[:, 5]) if len(g) > 1)
-dup_emails.to_csv('Duplicate-Entries.csv', sep=",")
-
+raffle_threshold = len(df_ISTE_SWEN.columns)*.2
 eligible['Total Incomplete Answers']= pd.isnull(eligible).astype(int).sum(axis=1)
-eligible = eligible.loc[eligible['Total Incomplete Answers']<raffle_threshold]
+eligible = eligible.loc[eligible['Total Incomplete Answers']<=raffle_threshold]
 
-dup_eligible  = list(set(dup_emails.iloc[:, 5]).intersection(set(eligible.iloc[:, 5])))
+try:
+    dup_emails = pd.concat(g for _, g in eligible.groupby(eligible.iloc[:, 5])if len(g) > 1)
+    dup_emails.to_csv('Duplicate-Entries.csv', sep=",")
 
-for dup in dup_eligible:
-	if (eligible.iloc[:,5] == dup).sum()>1:
-		print('more than 1')
+    dup_eligible  = list(set(dup_emails.iloc[:, 5]).intersection(set(eligible.iloc[:, 5])))
+    for dup in dup_eligible:
+        if (eligible.iloc[:,5] == dup).sum()>1:
+            print("Warning duplicate: " + dup)
+except:
+    print("No duplicate entries\n")
 
 random_winner = randint(0,len(eligible))
 print('Raffle Winner: ', eligible.iloc[random_winner,4], eligible.iloc[random_winner,5])
+print('* Warning: If there are duplicate entries, these must be manually removed before selecting the raffle winner.\n')
 eligible.to_csv('Eligible-Participants.csv', sep=",")
 
 # omit IDP questions 8,10,19. Starts with 0 index as 'Respondent ID'
