@@ -63,33 +63,30 @@ random_winner = randint(0,len(eligible))
 print('Raffle Winner: ', eligible.iloc[random_winner,4], eligible.iloc[random_winner,5])
 eligible.to_csv('Eligible-Participants.csv', sep=",")
 
-# omit IDP questions 8,10,19. Starts with 0 index as 'Respondent ID'
-df_ISTE_SWEN = df_ISTE_SWEN.drop(df_ISTE_SWEN.columns[[15, 17, 26]], axis=1)
-
 # place numeric equivalents for likert questions
 defaultScale = {'Agree very much': 6, 'Agree pretty much': 5, 'Agree a little': 4, 'Disagree a little': 3, 'Disagree pretty much': 2, 'Disagree very much': 1}
-IDPcolumns = [i for i in range(8,25) if i not in (19,20)]
+IDPcolumns = [i for i in range(8,28) if i not in (17,21,22)]
 formatScale (IDPcolumns, df_ISTE_SWEN, defaultScale)
 
-# place reverse numeric equivalents for likert (scale:1-6) questions: 14,15
+# place reverse numeric equivalents for likert (scale:1-6) questions: 10,14,15
 reverseScale = {'Agree very much': 1, 'Agree pretty much': 2, 'Agree a little': 3, 'Disagree a little': 4, 'Disagree pretty much': 5, 'Disagree very much': 6}
-df_ISTE_SWEN = df_ISTE_SWEN.replace({'I dont pity them': reverseScale, 'After frequent contact I find I just notice the person not the disability': reverseScale})
+df_ISTE_SWEN = df_ISTE_SWEN.replace({'I am aware of the problems that disabled people face': reverseScale, 'I dont pity them': reverseScale, 'After frequent contact I find I just notice the person not the disability': reverseScale})
 
 # change questions for experience questions
 expScale = {'I have personal experience with this': 2, 'I have knowledge of this': 1}
-formatScale (list(range(26,34)), df_ISTE_SWEN, expScale)
+formatScale (list(range(29,37)), df_ISTE_SWEN, expScale)
 
-# change software questions
+# # change software questions
 swScale = {'I have heard or read about this': 1, 'I have done this before': 2}
-formatScale (list(range(35,43)), df_ISTE_SWEN, swScale)
+formatScale (list(range(38,46)), df_ISTE_SWEN, swScale)
 
 # change web design questions
 webScale = {'I’m familiar with this issue': 1, 'I have taken this issue into account to make the site more accessible for people with disabilities': 2, 'I have taken this issue into account to make it more accessible for people with disabilities': 2}
-formatScale (list(range(43,59)), df_ISTE_SWEN, webScale)
+formatScale (list(range(46,62)), df_ISTE_SWEN, webScale)
 
 # change boolean questions
 booleanScale = {"Yes": 1, "No": 0}
-formatScale ([59,60], df_ISTE_SWEN, booleanScale)
+formatScale ([62,63], df_ISTE_SWEN, booleanScale)
 
 df_ISTE_SWEN.to_csv('Formatted-Data.csv', sep=",")
 
