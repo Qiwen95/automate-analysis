@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # title: surveySetup.py
-# author: Paula Garcia
+# author: Paula Conn
 # version: 2
 # status: development
 # python_version: 3.5.2
