@@ -6,6 +6,7 @@
 # status: development
 # python_version: 3.5.2
 # description: This python script can be used after each IST and SWEN data collection period. It will automatically select a survey winner among eligible students (Eligible-Participants.csv), output repeated entries, and format the results to numeric values with no extraneous columns created by SurveyMonkey.
+# latest update: added encoding to work with other computers (11/1/18)
 
 import pandas as pd
 import numpy as np
@@ -16,7 +17,7 @@ def formatScale (column_list, data, scale):
     data.iloc[:,column_list] = data.iloc[:,column_list].applymap(lambda s: scale.get(s) if s in scale else s)
 
 # import and format column headers
-df=pd.read_csv('Survey-for-ISTE-and-SWEN.csv')
+df=pd.read_csv('Survey-for-ISTE-and-SWEN.csv',  encoding = "ISO-8859-1")
 df.columns.values[13:33] = df.iloc[0,13:33]
 df.columns.values[43:67] = df.iloc[0,43:67]
 df.columns.values[43:51] = [str(col) + '_web' for col in df.columns[43:51]]
@@ -88,5 +89,5 @@ formatScale (list(range(46,62)), df_ISTE_SWEN, webScale)
 booleanScale = {"Yes": 1, "No": 0}
 formatScale ([62,63], df_ISTE_SWEN, booleanScale)
 
-df_ISTE_SWEN.to_csv('Formatted-Data.csv', sep=",")
+df_ISTE_SWEN.to_csv('Formatted-Data.csv', sep=",", encoding = 'utf-8-sig')
 
