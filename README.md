@@ -1,17 +1,22 @@
 # automate-analysis
-Series of scripts and programs to automate NSF-Ethics analysis and improve result reliability
+This script automates the analysis of the survey data for NSF-Ethics. Simply edit lines 126-129 to specify the type of data you would like to run. See file functionality below for more information.
+
+Note: This script does not identify duplicate CS entries. Duplicate CS entries are identified during reimbursement eligibility.
 
 ## Files:
 - surveySetup.py: This script automates the following tasks:
 1. Reformatting of columns and removal of extraneous SurveyMonkey columns
 2. Reformatting participant entered e-mail addresses to lowercase, without '@rit.edu' or '@g.rit.edu'
-3. Subsets the data to the current data collection period. Update this ID in row 33 and 34 to reflect what is necessary. The collection ID is provided in SurveyMonkey export (step 1).
-4. Finds eligible participants, for the Amazon giftcard, who have completed at least 80% of the survey. Selects the winner randomly.
-5. Formats text responses to their numeric equivalent scale. The final formatted data is saved as: Formatted-Data.csv.
+3. Subsets the data to the current data collection period. Update this ID in lines 126-129 to reflect what is necessary. The collection ID is provided in SurveyMonkey export (step 1).
+4. Finds eligible participants, for the $100 award, who have completed at least 80% of the survey. Selects the winner randomly.
+5. Identifies duplicate entries during IT and SE term collection. Duplicate entries are identified in the console and in the spreadsheet:
+Duplicate-Entries.csv
+6. Formats text responses to their numeric equivalent scale, including items that are reverse-scored. The final formatted data is saved as: Formatted-Data.csv.
+7. Rearranges all the columns to fit the master spreadsheet and factor analysis of the IDP scale.
 
 ## Requirements:
 - Survey-for-ISTE-and-SWEN.csv: download this file from SurveyMonkey, choosing the 'all responses' export option. 
-- Python 3.5.2 with pandas, numpy, and re installed.
+- Python 3.5.2 with pandas, numpy, sys, and re installed.
 
 ## Outputs:
 - Duplicate-Entries.csv: list of duplicate survey entries
