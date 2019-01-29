@@ -24,6 +24,8 @@ def formatScale (column_list, data, scale):
     data.iloc[:,column_list] = data.iloc[:,column_list].applymap(lambda s: scale.get(s) if s in scale else s)
 
 def assignScale(data):
+    data = data
+
     # place numeric equivalents for likert questions
     defaultScale = {'Agree very much': 6, 'Agree pretty much': 5, 'Agree a little': 4, 'Disagree a little': 3, 'Disagree pretty much': 2, 'Disagree very much': 1}
     IDPcolumns = [i for i in range(8,28) if i not in (17,21,22)]
@@ -51,7 +53,7 @@ def assignScale(data):
     return(data)
 
 def selectRaffleWinner (df, university, collector1, collector2):
-    # format student e-mails
+    # format student e-mails by removing the @email.com
     df.iloc[:,10] = df.iloc[:,10].str.lower()
 
     if university.lower() == 'rit':
@@ -68,6 +70,7 @@ def selectRaffleWinner (df, university, collector1, collector2):
 
     # combine both survey sets and remove empty columns created by Survey Monkey
     df_ISTE_SWEN = df_ISTE.append(df_SWEN)
+
     if ('IP Address' in df_ISTE_SWEN.columns):
         df_ISTE_SWEN = df_ISTE_SWEN.drop('IP Address', 1)
 
@@ -114,25 +117,27 @@ def arrangeData (data):
     reordered_data = data.reindex(columns=list(order))
 
     mismatch_columns = list(set(reordered_data) - set(data))
+
     if len(mismatch_columns) > 0:
-        print('\nColumns the columns do not match, please check both the Column-Order.csv and Survey-for-ISTE-and-SWEN.csv. Below are the mismatched columns:\n %s \n', mismatch_columns)
-        sys.exit()
+        print('\nError: Columns the columns do not match, please check both the Column-Order.csv and Survey-for-ISTE-and-SWEN.csv. It is possible that no responses were submitted for a column and the column header was deleted. Below are the mismatched columns:\n %s \n', mismatch_columns)
+    #    sys.exit()
 
     return(reordered_data)
 
 def main():
     ##################
     # Change the variables below to what you need:
+    # Ensure that both collector IDs are for the same term and interval (e.g., Fall Pre)
     ##################
-    collector1 = 99039395
-    collector2 = None #Assign to None if CS  
+    collector1 = 98658417
+    collector2 = 98658414 #Assign to None if CS  
     university = 'rit'
     isCS = False
 
     ################
 
     try:
-        df=pd.read_csv('Survey-for-ISTE-and-SWEN.csv', encoding = "utf-8")
+        df=pd.read_csv('Survey-for-ISTE-and-SWEN.csv', encoding = "utf-8", sep=',')
     except (FileNotFoundError, OSError):
         print('\nThe CSV file was not found. Please add the spreadsheet to the location of this file and name it: Survey-for-ISTE-and-SWEN.csv\n')
         sys.exit()
