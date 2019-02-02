@@ -142,6 +142,11 @@ def main():
         print('\nThe CSV file was not found. Please add the spreadsheet to the location of this file and name it: Survey-for-ISTE-and-SWEN.csv\n')
         sys.exit()
 
+    # Uncomment the code below if CS data includes new formatting by SurveyMonkey
+#    if isCS:
+#        if ('Respondent ID' in df.columns):
+#            df = df.drop('Respondent ID', 1)
+
     # import and format column headers
     df.columns.values[13:33] = df.iloc[0,13:33]
     df.columns.values[43:67] = df.iloc[0,43:67]
