@@ -1,12 +1,20 @@
 #!/usr/bin/env python
-
-# title: surveySetup.py
-# author: Paula Conn
-# version: 2
-# status: development
+# -*- coding: UTF-8 -*-
 # python_version: 3.5.2
-# description: This python script can be used after each IST and SWEN data collection period. It will automatically select a survey winner among eligible students (Eligible-Participants.csv), output repeated entries, and format the results to numeric values with no extraneous columns created by SurveyMonkey.
-# latest update: added encoding to work with other computers (11/1/18), added functionality for CS surveys and created ordered output in csv (11/2/18).
+
+'''
+title: surveySetup.py
+author: Paula Conn
+version: 3
+status: in-use
+description: This python script can be used after each IST and SWEN data 
+  collection period. It will automatically select a survey winner among eligible 
+  students (Eligible-Participants.csv), output repeated entries, and format the 
+  results to numeric values with no extraneous columns created by SurveyMonkey.
+latest update: added encoding to work with other computers (11/1/18), added 
+  functionality for CS surveys and created ordered output in csv (11/2/18),
+  added isCS to arrangedata function  (2/15/19).
+'''
 
 try:
     import sys
@@ -17,23 +25,30 @@ try:
     import csv
 
 except ImportError:
-    print("Error: missing a library (pandas, numpy, random, re, etc.). Please install.")
+    print("Error: missing a library (pandas, numpy, random, re, etc.).",
+    	"Please install. \n NOTE: If error is with pandas module, ensure that the",
+    	"code is running on the latest version of python")
     sys.exit()
 
 def formatScale (column_list, data, scale):
-    data.iloc[:,column_list] = data.iloc[:,column_list].applymap(lambda s: scale.get(s) if s in scale else s)
+    data.iloc[:,column_list] = data.iloc[:,column_list].applymap(lambda s: 
+    	scale.get(s) if s in scale else s)
 
 def assignScale(data):
     data = data
 
     # place numeric equivalents for likert questions
-    defaultScale = {'Agree very much': 6, 'Agree pretty much': 5, 'Agree a little': 4, 'Disagree a little': 3, 'Disagree pretty much': 2, 'Disagree very much': 1}
+    defaultScale = {'Agree very much': 6, 'Agree pretty much': 5, 'Agree a little': 4, 
+       'Disagree a little': 3, 'Disagree pretty much': 2, 'Disagree very much': 1}
     IDPcolumns = [i for i in range(8,28) if i not in (17,21,22)]
     formatScale (IDPcolumns, data, defaultScale)
 
     # place reverse numeric equivalents for likert (scale:1-6) questions: 10,14,15
-    reverseScale = {'Agree very much': 1, 'Agree pretty much': 2, 'Agree a little': 3, 'Disagree a little': 4, 'Disagree pretty much': 5, 'Disagree very much': 6}
-    data = data.replace({'I am aware of the problems that disabled people face': reverseScale, 'I dont pity them': reverseScale, 'After frequent contact I find I just notice the person not the disability': reverseScale})
+    reverseScale = {'Agree very much': 1, 'Agree pretty much': 2, 'Agree a little': 3, 
+       'Disagree a little': 4, 'Disagree pretty much': 5, 'Disagree very much': 6}
+    data = data.replace({'I am aware of the problems that disabled people face': reverseScale, 
+    	'I dont pity them': reverseScale, 
+    	'After frequent contact I find I just notice the person not the disability': reverseScale})
 
     # change questions for experience questions
     expScale = {'I have personal experience with this': 2, 'I have knowledge of this': 1}
@@ -43,8 +58,13 @@ def assignScale(data):
     swScale = {'I have heard or read about this': 1, 'I have done this before': 2}
     formatScale (list(range(38,46)), data, swScale)
 
-    # change web design questions
-    webScale = {'I’m familiar with this issue': 1, 'I have taken this issue into account to make the site more accessible for people with disabilities': 2, 'I have taken this issue into account to make it more accessible for people with disabilities': 2}
+    # change web design questions. If you receive an error of: 
+    # 'SyntaxError: Non-ASCII character '\xe2' ensure that the code is running on 
+    #  the latest version of Python. If you are using SublimeText, a custom build 
+    #  will be needed to use Python3.
+    webScale = {'I’m familiar with this issue': 1, 
+       'I have taken this issue into account to make the site more accessible for people with disabilities': 2, 
+       'I have taken this issue into account to make it more accessible for people with disabilities': 2}
     formatScale (list(range(46,62)), data, webScale)
 
     # change boolean questions
@@ -87,7 +107,8 @@ def selectRaffleWinner (df, university, collector1, collector2):
         for dup in dup_eligible:
             if (eligible.iloc[:,5] == dup).sum()>1:
                 print("Warning duplicate: " + dup)
-                print("\n Program stopped due to duplicates. Please resolve duplicate entries in the spreadsheet and run the program again. \n")
+                print("\n Program stopped due to duplicates. Please resolve duplicate",
+                   "entries in the spreadsheet and run the program again. \n")
                 sys.exit()
     except:
         print("No duplicate entries\n")
@@ -103,12 +124,16 @@ def selectRaffleWinner (df, university, collector1, collector2):
 
     return(df_ISTE_SWEN)
 
-def arrangeData (data):
+def arrangeData (data, isCS):
     # arrange data based on master spreadsheet
     try:
-        order=pd.read_csv('Column-Order.csv', encoding = "utf-8")
+    	if isCS:
+    		order=pd.read_csv('CS-Column-Order.csv', encoding = "utf-8")
+    	else:
+        	order=pd.read_csv('Column-Order.csv', encoding = "utf-8")
     except (FileNotFoundError, OSError, UnicodeDecodeError):
-        print('\nThe CSV file for the final column order was not found OR was not in utf-8 format. Please add the spreadsheet to the location of this file and name it: Column-Order.csv\n')
+        print("\nThe CSV file for the final column order was not found OR was not in utf-8 format.",
+        	"Please add the spreadsheet to the location of this file and name it: Column-Order.csv\n")
         sys.exit()
 
     # remove punctuation in column headers
@@ -119,7 +144,10 @@ def arrangeData (data):
     mismatch_columns = list(set(reordered_data) - set(data))
 
     if len(mismatch_columns) > 0:
-        print('\nError: Columns the columns do not match, please check both the Column-Order.csv and Survey-for-ISTE-and-SWEN.csv. It is possible that no responses were submitted for a column and the column header was deleted. Below are the mismatched columns:\n %s \n', mismatch_columns)
+        print('\nError: Columns the columns do not match, please check both the',
+         'Column-Order.csv and Survey-for-ISTE-and-SWEN.csv. It is possible that no',
+         'responses were submitted for a column and the column header was deleted.',
+         ' Below are the mismatched columns:\n %s \n', mismatch_columns)
     #    sys.exit()
 
     return(reordered_data)
@@ -129,8 +157,8 @@ def main():
     # Change the variables below to what you need:
     # Ensure that both collector IDs are for the same term and interval (e.g., Fall Pre)
     ##################
-    collector1 = 98658417
-    collector2 = 98658414 #Assign to None if CS  
+    collector1 = 99123866
+    collector2 = 99123877 #Assign to None if CS  
     university = 'rit'
     isCS = False
 
@@ -139,7 +167,8 @@ def main():
     try:
         df=pd.read_csv('Survey-for-ISTE-and-SWEN.csv', encoding = "utf-8", sep=',')
     except (FileNotFoundError, OSError):
-        print('\nThe CSV file was not found. Please add the spreadsheet to the location of this file and name it: Survey-for-ISTE-and-SWEN.csv\n')
+        print('\nThe CSV file was not found. Please add the spreadsheet to the location',
+          'of this file and name it: Survey-for-ISTE-and-SWEN.csv\n')
         sys.exit()
 
     # Uncomment the code below if CS data includes new formatting by SurveyMonkey
@@ -163,13 +192,14 @@ def main():
 
     else:
         if None in (collector1, collector2):
-            print('\nA collector ID was not found. When running non-CS data, please enter both collector IDs for IT and SE students.\n')
+            print('\nA collector ID was not found. When running non-CS data, please'
+             'enter both collector IDs for IT and SE students.\n')
             sys.exit()
 
         df = selectRaffleWinner(df, university, collector1, collector2)
 
     df = assignScale(df)
-    df = arrangeData(df)
+    df = arrangeData(df, isCS)
     df.to_csv('Formatted-Data.csv', sep=",", encoding = 'utf-8-sig')
 
 
